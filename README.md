@@ -31,6 +31,7 @@ use {
 ```lua
 {
   overwrite_q_command = true, -- Replaces :q and :qa with :ConfirmQuit and :ConfirmQuitAll
+  confirm_multi_bufs = false, -- Confirm exit if multiple buffers are open
 }
 ```
 

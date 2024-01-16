@@ -2,6 +2,7 @@ local M = {}
 
 local options = {
 	overwrite_q_command = true,
+	confirm_multi_bufs = false,
 }
 
 local GENERIC_ERROR_MESSAGE = "ConfirmQuit: Error while quitting"
@@ -18,6 +19,21 @@ local function is_any_buffer_modified()
 	end
 
 	return false
+end
+
+local function has_multiple_buffers()
+	local count = 0
+
+	for buffer = 1, vim.fn.bufnr('$') do
+		if vim.fn.buflisted(buffer) == 1 then
+			count = count + 1
+		end
+		if count > 1 then
+			break
+		end
+	end
+
+	return count > 1
 end
 
 local function is_last_window()
@@ -64,6 +80,8 @@ function M.confirm_quit(opts)
 	local should_quit = opts.bang                                  -- Force-quit without prompting
 	                    or (vim.bo.modified and not vim.o.confirm) -- or: Unsaved changes. Try quit to print error
 	                    or not is_last_viewable                    -- or: Isn't last viewable. Simply quit
+	                    or not options.confirm_multi_bufs          -- or: don't care about multiple buffers
+	                    or not has_multiple_buffers()              -- or: have only single buffer
 	                    or prompt_user_to_quit()                   -- or: Last viewable. Prompt to quit
 
 	if should_quit then
